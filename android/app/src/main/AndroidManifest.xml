@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- allowBackup=false: данные приложения (localStorage WebView с клиентами и заказами)
+         не выгружаются в облачный бэкап Google и не переносятся через adb backup.
+         Пользователь управляет копиями сам: Настройки → Резервная копия. -->
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBarLaunch"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
+    </application>
+
+    <!-- Permissions -->
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <!-- Напоминания в системе (@capacitor/local-notifications). Те же разрешения
+         объявлены и плагином, но здесь они видны сразу: без POST_NOTIFICATIONS
+         (Android 13+) уведомления не показываются. Система спрашивает это разрешение
+         сама — когда появляется первое напоминание с будущим сроком; на старых
+         версиях оно выдано заранее. Отказ виден подписью под списком напоминаний
+         на главном экране, а состояние — в «Настройки → Напоминания». -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Точные будильники — от них зависит, придёт напоминание в назначенную минуту
+         или система отложит его (неточный будильник она сдвигает на неопределённый
+         срок, в спящем телефоне — на часы; из-за этого напоминания «молчали»).
+         USE_EXACT_ALARM (Android 13+) система выдаёт приложению при установке: ничего
+         включать не нужно. SCHEDULE_EXACT_ALARM (Android 12) на этой версии Android
+         тоже выдано по умолчанию и остаётся страховкой для устройств, где первое
+         разрешение не сработало: тогда его можно выдать в системных настройках
+         («Будильники и напоминания») — приложение подскажет об этом в настройках. -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+</manifest>
