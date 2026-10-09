@@ -1,0 +1,54 @@
+
+name: Build single-file CRM
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.singlefile.ts'
+      - '.github/workflows/build-singlefile.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-singlefile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install single-file plugin
+        run: npm install --no-save --package-lock=false vite-plugin-singlefile
+
+      - name: Build CRM
+        run: npx vite build -c vite.config.singlefile.ts
+
+      - name: Verify output
+        run: |
+          test -s dist/index.html
+          wc -c dist/index.html
+
+      - name: Upload HTML artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: crm-singlefile-index-html
+          path: dist/index.html
+          if-no-files-found: error
+          retention-days: 14
